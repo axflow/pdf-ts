@@ -1,7 +1,7 @@
 import Path from 'node:path';
 import fs from 'node:fs/promises';
 
-import pdfToText, { pdfToPages } from '../src';
+import { pdfToText, pdfToPages } from '../src';
 
 describe('pdf-ts', () => {
   describe('pdfToText', () => {

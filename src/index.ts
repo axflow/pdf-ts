@@ -18,7 +18,7 @@ import { TextItem, TextMarkedContent } from 'pdfjs-dist/types/src/display/api';
  * @param options.nodeSep Optionally specifiy the string used to join nodes in the document.
  * @returns A string containing the PDF converted to text.
  */
-export default async function pdfToText(
+export async function pdfToText(
   pdf: ArrayBufferLike,
   options?: { pageSep?: string; nodeSep?: string },
 ): Promise<string> {
