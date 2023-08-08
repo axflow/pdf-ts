@@ -1,13 +1,5 @@
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.js';
-import type { PDFPageProxy } from 'pdfjs-dist/legacy/build/pdf.js';
-import { TextItem, TextMarkedContent } from 'pdfjs-dist/types/src/display/api';
-
-/*
- * The following examples influenced this code:
- *
- *   1. https://github.com/mozilla/pdf.js/blob/v2.16.105/examples/node/getinfo.js
- *   2. https://gitlab.com/autokent/pdf-parse/-/blob/v1.1.1/lib/pdf-parse.js
- */
+import { getDocument } from 'pdfjs-dist/build/pdf.js';
+import { PDFPageProxy, TextItem, TextMarkedContent } from 'pdfjs-dist/build/pdf.js';
 
 /**
  * Given a PDF, extract and return its text content.
@@ -19,7 +11,7 @@ import { TextItem, TextMarkedContent } from 'pdfjs-dist/types/src/display/api';
  * @returns A string containing the PDF converted to text.
  */
 export async function pdfToText(
-  pdf: ArrayBufferLike,
+  pdf: Buffer | Uint8Array,
   options?: { pageSep?: string; nodeSep?: string },
 ): Promise<string> {
   const pages = await pdfToPages(pdf, options);
@@ -41,10 +33,17 @@ export type PageType = {
  * @returns A list of pages objects containing the page number and text content.
  */
 export async function pdfToPages(
-  pdf: ArrayBuffer,
+  pdf: Buffer | Uint8Array,
   options?: { nodeSep?: string },
 ): Promise<PageType[]> {
-  const document = await getDocument(pdf).promise;
+  pdf = normalizeBuffer(pdf);
+  const document = await getDocument({
+    data: pdf,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    useSystemFonts: true,
+  }).promise;
+
   const numPages = document.numPages;
 
   const pages: PageType[] = [];
@@ -59,7 +58,6 @@ export async function pdfToPages(
       } catch (error) {
         throw error;
       } finally {
-        // Release page resources.
         page.cleanup();
       }
     }
@@ -85,4 +83,8 @@ function getTextItems(items: Array<TextItem | TextMarkedContent>): TextItem[] {
 
 function getStringOptionOrDefault(option: string | undefined, optionDefault: string) {
   return typeof option === 'string' ? option : optionDefault;
+}
+
+function normalizeBuffer(buffer: Buffer | Uint8Array) {
+  return buffer instanceof Buffer ? new Uint8Array(buffer.buffer) : buffer;
 }

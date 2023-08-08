@@ -28,7 +28,7 @@
   "author": "Axilla (https://axilla.io)",
   "license": "MIT",
   "dependencies": {
-    "pdfjs-dist": "2.16.105"
+    "pdfjs-dist": "1.10.100"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
